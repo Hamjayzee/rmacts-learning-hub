@@ -6,6 +6,7 @@ type Material = { id: string; title?: string; description?: string };
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut
 } from "firebase/auth";
 import {
@@ -123,6 +124,69 @@ export default function App() {
     );
   }
 
+  async function handleReset(e: FormEvent) {
+    e.preventDefault();
+    setMessage("Please wait...");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage(
+        "If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder."
+      );
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === "auth/user-not-found") {
+        setMessage(
+          "If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder."
+        );
+      } else if (code === "auth/invalid-email") {
+        setMessage("Please enter a valid email address.");
+      } else if (code === "auth/too-many-requests") {
+        setMessage("Too many attempts. Please wait a few minutes and try again.");
+      } else {
+        setMessage(error instanceof Error ? error.message : String(error));
+      }
+    }
+  }
+
+  if (mode === "reset") {
+    return (
+      <main className="container">
+        <div className="brand">R</div>
+        <h1>RMACTS Learning Box</h1>
+        <p>Your learning resources, all in one place.</p>
+
+        <form className="panel" onSubmit={handleReset}>
+          <h2>Reset Password</h2>
+          <p>Enter your account email and we'll send you a link to choose a new password.</p>
+
+          <label>Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            placeholder="Enter your email"
+          />
+
+          <button type="submit">Send Reset Link</button>
+
+          <p>{message}</p>
+
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              setMode("login");
+              setMessage("");
+            }}
+          >
+            Back to Login
+          </button>
+        </form>
+      </main>
+    );
+  }
+
   return (
     <main className="container">
       <div className="brand">R</div>
@@ -156,6 +220,19 @@ export default function App() {
         </button>
 
         <p>{message}</p>
+
+        {mode === "login" && (
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              setMode("reset");
+              setMessage("");
+            }}
+          >
+            Forgot Password?
+          </button>
+        )}
 
         <button
           type="button"
