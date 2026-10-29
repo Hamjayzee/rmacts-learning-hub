@@ -2,7 +2,15 @@
 import { useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 
-type Material = { id: string; title?: string; description?: string; link?: string };
+type Material = {
+  id: string;
+  title?: string;
+  description?: string;
+  link?: string;
+  fileUrl?: string;
+  fileName?: string;
+  isQuiz?: boolean;
+};
 import AdminDashboard from "./AdminDashboard";
 import {
   signInWithEmailAndPassword,
@@ -101,9 +109,18 @@ export default function App() {
           <button onClick={loadMaterials}>Load Materials</button>
           {materials.map(item => (
             <article key={item.id}>
-              <h3>{item.title || "Untitled material"}</h3>
+              <h3>{item.title || "Untitled material"}{item.isQuiz ? " (Quiz)" : ""}</h3>
               <p>{item.description || ""}</p>
-              {item.link && <p><a href={item.link} target="_blank" rel="noreferrer">Open link</a></p>}
+              {item.fileUrl && (
+                <p>
+                  <a href={item.fileUrl} target="_blank" rel="noreferrer">
+                    Open file{item.fileName ? `: ${item.fileName}` : ""}
+                  </a>
+                </p>
+              )}
+              {item.link && (
+                <p><a href={item.link} target="_blank" rel="noreferrer">{item.isQuiz ? "Take quiz" : "Open link"}</a></p>
+              )}
             </article>
           ))}
         </section>

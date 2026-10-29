@@ -8,10 +8,22 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { db, storage } from "./firebase";
 
-type Material = { id: string; title?: string; description?: string; link?: string };
+export type Material = {
+  id: string;
+  title?: string;
+  description?: string;
+  link?: string;
+  fileUrl?: string;
+  fileName?: string;
+  isQuiz?: boolean;
+};
 type Student = { id: string; email?: string; role?: string };
+
+const ACCEPTED_FILE_TYPES =
+  ".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
 
 export default function AdminDashboard() {
   const [materials, setMaterials] = useState<Material[]>([]);
@@ -19,7 +31,10 @@ export default function AdminDashboard() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
+  const [isQuiz, setIsQuiz] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
   async function loadMaterials() {
@@ -49,14 +64,34 @@ export default function AdminDashboard() {
     setTitle("");
     setDescription("");
     setLink("");
+    setIsQuiz(false);
+    setFile(null);
     setEditingId(null);
   }
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setMessage("Saving...");
+
     try {
-      const data = { title: title.trim(), description: description.trim(), link: link.trim() };
+      const data: Record<string, unknown> = {
+        title: title.trim(),
+        description: description.trim(),
+        link: link.trim(),
+        isQuiz,
+      };
+
+      if (file) {
+        setMessage("Uploading file...");
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const fileRef = ref(storage, `materials/${Date.now()}-${safeName}`);
+        await uploadBytes(fileRef, file);
+        data["fileUrl"] = await getDownloadURL(fileRef);
+        data["fileName"] = file.name;
+      }
+
       if (editingId) {
         await updateDoc(doc(db, "materials", editingId), data);
         setMessage("Material updated.");
@@ -67,7 +102,11 @@ export default function AdminDashboard() {
       resetForm();
       loadMaterials();
     } catch {
-      setMessage("Could not save. Check that Firestore rules allow admins to write materials.");
+      setMessage(
+        "Could not save. If you attached a file, check that Firebase Storage is enabled and its rules allow admins to write."
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -92,9 +131,30 @@ export default function AdminDashboard() {
         <input value={title} onChange={e => setTitle(e.target.value)} required placeholder="e.g. Week 1 Notes" />
         <label>Description</label>
         <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Short description" />
+
+        <label>Attach a file (PDF, PowerPoint, Word, Excel)</label>
+        <input
+          type="file"
+          accept={ACCEPTED_FILE_TYPES}
+          onChange={e => setFile(e.target.files?.[0] ?? null)}
+        />
+
         <label>Link (optional)</label>
         <input type="url" value={link} onChange={e => setLink(e.target.value)} placeholder="https://..." />
-        <button type="submit">{editingId ? "Save Changes" : "Add Material"}</button>
+
+        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <input
+            type="checkbox"
+            checked={isQuiz}
+            onChange={e => setIsQuiz(e.target.checked)}
+            style={{ width: "auto" }}
+          />
+          This link is a quiz (e.g. Google Forms)
+        </label>
+
+        <button type="submit" disabled={busy}>
+          {busy ? "Working..." : editingId ? "Save Changes" : "Add Material"}
+        </button>
         {editingId && (
           <button type="button" className="secondary" onClick={resetForm}>Cancel Edit</button>
         )}
@@ -104,9 +164,21 @@ export default function AdminDashboard() {
       <h3>All Materials ({materials.length})</h3>
       {materials.map(item => (
         <article key={item.id}>
-          <h4>{item.title || "Untitled material"}</h4>
+          <h4>
+            {item.title || "Untitled material"}
+            {item.isQuiz ? " (Quiz)" : ""}
+          </h4>
           <p>{item.description || ""}</p>
-          {item.link && <p><a href={item.link} target="_blank" rel="noreferrer">Open link</a></p>}
+          {item.fileUrl && (
+            <p>
+              <a href={item.fileUrl} target="_blank" rel="noreferrer">
+                Open file{item.fileName ? `: ${item.fileName}` : ""}
+              </a>
+            </p>
+          )}
+          {item.link && (
+            <p><a href={item.link} target="_blank" rel="noreferrer">{item.isQuiz ? "Open quiz" : "Open link"}</a></p>
+          )}
           <button
             type="button"
             className="secondary"
@@ -115,6 +187,8 @@ export default function AdminDashboard() {
               setTitle(item.title || "");
               setDescription(item.description || "");
               setLink(item.link || "");
+              setIsQuiz(!!item.isQuiz);
+              setFile(null);
               setMessage("");
             }}
           >
