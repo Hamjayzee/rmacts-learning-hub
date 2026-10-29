@@ -2,7 +2,8 @@
 import { useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 
-type Material = { id: string; title?: string; description?: string };
+type Material = { id: string; title?: string; description?: string; link?: string };
+import AdminDashboard from "./AdminDashboard";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -93,13 +94,7 @@ export default function App() {
         <p>Welcome, {user.email}</p>
         <p>Account type: {role}</p>
 
-        {role === "admin" && (
-          <section className="panel">
-            <h2>Admin Dashboard</h2>
-            <p>You are signed in as an administrator.</p>
-            <p>Material upload will be added after storage is arranged.</p>
-          </section>
-        )}
+        {role === "admin" && <AdminDashboard />}
 
         <section className="panel">
           <h2>Learning Materials</h2>
@@ -108,6 +103,7 @@ export default function App() {
             <article key={item.id}>
               <h3>{item.title || "Untitled material"}</h3>
               <p>{item.description || ""}</p>
+              {item.link && <p><a href={item.link} target="_blank" rel="noreferrer">Open link</a></p>}
             </article>
           ))}
         </section>
