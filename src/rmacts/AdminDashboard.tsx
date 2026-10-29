@@ -88,8 +88,8 @@ export default function AdminDashboard() {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const fileRef = ref(storage, `materials/${Date.now()}-${safeName}`);
         await uploadBytes(fileRef, file);
-        data.fileUrl = await getDownloadURL(fileRef);
-        data.fileName = file.name;
+        data["fileUrl"] = await getDownloadURL(fileRef);
+        data["fileName"] = file.name;
       }
 
       if (editingId) {
