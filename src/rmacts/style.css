@@ -53,6 +53,10 @@ h2 {
   font-size: 21px;
 }
 
+.container > p {
+  color: #e8f0fb;
+}
+
 p {
   line-height: 1.6;
   color: #596579;
