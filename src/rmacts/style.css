@@ -11,7 +11,7 @@ body {
   background-color: #0b1d33;
   background-image:
     linear-gradient(rgba(11, 29, 51, 0.45), rgba(11, 29, 51, 0.45)),
-    url("https://images.pexels.com/photos/37898351/pexels-photo-37898351.jpeg?auto=compress&cs=tinysrgb&h=650&w=940");
+    url("./background.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
