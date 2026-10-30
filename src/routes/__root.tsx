@@ -78,10 +78,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "RMACTS Learning Box" },
+      { title: "RMACTS Learning Hub" },
       { name: "description", content: "Student learning resources" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "RMACTS Learning Box" },
+      { property: "og:title", content: "RMACTS Learning Hub" },
       { property: "og:description", content: "Student learning resources" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
