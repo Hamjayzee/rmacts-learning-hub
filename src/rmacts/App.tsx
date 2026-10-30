@@ -2,16 +2,7 @@
 import { useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 
-type Material = {
-  id: string;
-  title?: string;
-  description?: string;
-  link?: string;
-  fileUrl?: string;
-  fileName?: string;
-  isQuiz?: boolean;
-};
-import AdminDashboard from "./AdminDashboard";
+import Dashboard from "./Dashboard";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -21,9 +12,7 @@ import {
 import {
   doc,
   getDoc,
-  setDoc,
-  collection,
-  getDocs
+  setDoc
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
@@ -36,7 +25,6 @@ export default function App() {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState("student");
-  const [materials, setMaterials] = useState<Material[]>([]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -82,59 +70,17 @@ export default function App() {
     }
   }
 
-  async function loadMaterials() {
-    try {
-      const snapshot = await getDocs(collection(db, "materials"));
-      setMaterials(
-        snapshot.docs.map(item => ({
-          id: item.id,
-          ...item.data()
-        }))
-      );
-    } catch (error) {
-      setMessage("Could not load materials. Check Firestore rules.");
-    }
-  }
-
   if (user) {
     return (
-      <main className="container">
-        <h1>RMACTS Learning Hub</h1>
-        <p>Welcome, {user.email}</p>
-        <p>Account type: {role}</p>
-
-        {role === "admin" && <AdminDashboard />}
-
-        <section className="panel">
-          <h2>Learning Materials</h2>
-          <button onClick={loadMaterials}>Load Materials</button>
-          {materials.map(item => (
-            <article key={item.id}>
-              <h3>{item.title || "Untitled material"}{item.isQuiz ? " (Quiz)" : ""}</h3>
-              <p>{item.description || ""}</p>
-              {item.fileUrl && (
-                <p>
-                  <a href={item.fileUrl} target="_blank" rel="noreferrer">
-                    Open file{item.fileName ? `: ${item.fileName}` : ""}
-                  </a>
-                </p>
-              )}
-              {item.link && (
-                <p><a href={item.link} target="_blank" rel="noreferrer">{item.isQuiz ? "Take quiz" : "Open link"}</a></p>
-              )}
-            </article>
-          ))}
-        </section>
-
-        <button onClick={async () => {
+      <Dashboard
+        user={user}
+        role={role}
+        onLogout={async () => {
           await signOut(auth);
           setUser(null);
           setMessage("");
-        }}>
-          Log out
-        </button>
-        <p>{message}</p>
-      </main>
+        }}
+      />
     );
   }
 

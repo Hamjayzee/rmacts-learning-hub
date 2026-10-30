@@ -25,7 +25,7 @@ type Student = { id: string; email?: string; role?: string };
 const ACCEPTED_FILE_TYPES =
   ".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ view, onChange }: { view: "manage" | "students"; onChange?: () => void }) {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [title, setTitle] = useState("");
@@ -101,6 +101,7 @@ export default function AdminDashboard() {
       }
       resetForm();
       loadMaterials();
+      onChange?.();
     } catch {
       setMessage(
         "Could not save. If you attached a file, check that Firebase Storage is enabled and its rules allow admins to write."
@@ -116,15 +117,36 @@ export default function AdminDashboard() {
       await deleteDoc(doc(db, "materials", item.id));
       setMessage("Material deleted.");
       loadMaterials();
+      onChange?.();
     } catch {
       setMessage("Could not delete. Check Firestore rules.");
     }
   }
 
-  return (
-    <section className="panel">
-      <h2>Admin Dashboard</h2>
+  const studentList = students.filter(s => s.role !== "admin");
 
+  if (view === "students") {
+    return (
+      <section className="dash-section">
+        <div className="section-head"><h3>Registered Students ({studentList.length})</h3></div>
+        {message && <p className="error">{message}</p>}
+        <div className="table">
+          {studentList.length === 0 && <p className="muted">No students yet.</p>}
+          {studentList.map((s, i) => (
+            <div className="row" key={s.id}>
+              <span className="avatar sm">{(s.email || "?").charAt(0).toUpperCase()}</span>
+              <span className="row-main">{s.email || s.id}</span>
+              <span className="muted">#{i + 1}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <div className="manage">
+      <section className="panel">
       <form onSubmit={handleSave}>
         <h3>{editingId ? "Edit Material" : "Add Material"}</h3>
         <label>Title</label>
@@ -160,10 +182,12 @@ export default function AdminDashboard() {
         )}
       </form>
       <p>{message}</p>
-
+      </section>
+      <section className="dash-section">
       <h3>All Materials ({materials.length})</h3>
+      <div className="m-grid">
       {materials.map(item => (
-        <article key={item.id}>
+        <article key={item.id} className="m-card">
           <h4>
             {item.title || "Untitled material"}
             {item.isQuiz ? " (Quiz)" : ""}
@@ -179,6 +203,7 @@ export default function AdminDashboard() {
           {item.link && (
             <p><a href={item.link} target="_blank" rel="noreferrer">{item.isQuiz ? "Open quiz" : "Open link"}</a></p>
           )}
+          <div className="m-actions">
           <button
             type="button"
             className="secondary"
@@ -195,15 +220,11 @@ export default function AdminDashboard() {
             Edit
           </button>
           <button type="button" className="secondary" onClick={() => handleDelete(item)}>Delete</button>
+          </div>
         </article>
       ))}
-
-      <h3>Students ({students.filter(s => s.role !== "admin").length})</h3>
-      <ul>
-        {students.filter(s => s.role !== "admin").map(s => (
-          <li key={s.id}>{s.email || s.id}</li>
-        ))}
-      </ul>
-    </section>
+      </div>
+      </section>
+    </div>
   );
 }
