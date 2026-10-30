@@ -26,17 +26,14 @@ body {
   text-align: center;
 }
 
-.brand {
-  width: 64px;
-  height: 64px;
-  margin: 10px auto 18px;
-  display: grid;
-  place-items: center;
+.brand-logo {
+  display: block;
+  width: 160px;
+  height: auto;
+  margin: 10px auto 12px;
   border-radius: 18px;
-  background: #10243a;
-  color: #ffffff;
-  font-size: 30px;
-  font-weight: bold;
+  background: #06090f;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
 }
 
 h1 {
@@ -127,6 +124,10 @@ article h3 {
 @media (max-width: 380px) {
   .container {
     padding: 20px 12px;
+  }
+
+  .brand-logo {
+    width: 130px;
   }
 
   .panel {

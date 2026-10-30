@@ -26,6 +26,7 @@ import {
   getDocs
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
+import logoUrl from "./assets/rmacts-logo.png.asset.json";
 import "./style.css";
 
 export default function App() {
@@ -164,7 +165,7 @@ export default function App() {
   if (mode === "reset") {
     return (
       <main className="container">
-        <div className="brand">R</div>
+        <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
         <h1>RMACTS Learning Box</h1>
         <p>Your learning resources, all in one place.</p>
 
@@ -202,7 +203,7 @@ export default function App() {
 
   return (
     <main className="container">
-      <div className="brand">R</div>
+      <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
       <h1>RMACTS Learning Box</h1>
       <p>Your learning resources, all in one place.</p>
 
