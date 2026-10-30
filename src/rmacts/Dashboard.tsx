@@ -68,7 +68,7 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
     return q ? list.filter(m => `${m.title} ${m.description}`.toLowerCase().includes(q)) : list;
   }, [materials, tab, query]);
 
-  const name = (user.email || "").split("@")[0];
+  const name = (user.email || "").split("@")[0] ?? "";
   const tabs: { id: Tab; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "library", label: "Library" },
