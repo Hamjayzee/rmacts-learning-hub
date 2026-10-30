@@ -5,7 +5,7 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Sora", "Segoe UI", Arial, Helvetica, sans-serif;
   color: #172033;
   min-height: 100vh;
   background-color: #0b1d33;
@@ -37,17 +37,18 @@ body {
 }
 
 h1 {
-  color: #c2410c;
+  color: #ffb703;
   font-size: 32px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  text-shadow: 0 2px 10px rgba(6, 12, 22, 0.85);
   margin-bottom: 8px;
 }
 
 h2 {
-  color: #10243a;
+  color: #13335c;
   font-size: 21px;
+  font-weight: 700;
 }
 
 .container > p {
