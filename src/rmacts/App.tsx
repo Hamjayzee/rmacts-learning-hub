@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 
 import Dashboard from "./Dashboard";
+import StudentProfile, { loadProfileData } from "./StudentProfile";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 import "./style.css";
 
@@ -13,13 +14,16 @@ async function getFirebase() {
   return { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, doc, getDoc, setDoc };
 }
 
+type View = "login" | "reset" | "profile" | "dashboard";
+
 export default function App() {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState("student");
+  const [view, setView] = useState<View>("login");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -60,25 +64,22 @@ export default function App() {
 
       setUser(result.user);
       setRole(profile.data()?.["role"] || "student");
+
+      const studentRole = profile.data()?.["role"] || "student";
+      if (studentRole === "student") {
+        const profileData = await loadProfileData(result.user.uid);
+        if (!profileData || !profileData.surname) {
+          setView("profile");
+          setMessage("Please complete your profile to continue.");
+          return;
+        }
+      }
+
+      setView("dashboard");
       setMessage("Welcome to RMACTS Learning Hub!");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }
-  }
-
-  if (user) {
-    return (
-      <Dashboard
-        user={user}
-        role={role}
-        onLogout={async () => {
-          const fb = await getFirebase();
-          await fb.signOut(fb.auth);
-          setUser(null);
-          setMessage("");
-        }}
-      />
-    );
   }
 
   async function handleReset(e: FormEvent) {
@@ -106,7 +107,38 @@ export default function App() {
     }
   }
 
-  if (mode === "reset") {
+  async function handleLogout() {
+    const fb = await getFirebase();
+    await fb.signOut(fb.auth);
+    setUser(null);
+    setView("login");
+    setMessage("");
+    setMode("login");
+  }
+
+  if (user && view === "profile") {
+    return (
+      <StudentProfile
+        user={user}
+        onSaveed={() => {
+          setView("dashboard");
+          setMessage("Welcome to RMACTS Learning Hub!");
+        }}
+      />
+    );
+  }
+
+  if (user && view === "dashboard") {
+    return (
+      <Dashboard
+        user={user}
+        role={role}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  if (view === "reset") {
     return (
       <main className="container">
         <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
@@ -115,7 +147,7 @@ export default function App() {
 
         <form className="panel" onSubmit={handleReset}>
           <h2>Reset Password</h2>
-          <p>Enter your account email and we'll send you link to choose a new password.</p>
+          <p>Enter your account email and we'll send you a link to choose a new password.</p>
 
           <label>Email Address</label>
           <input
@@ -134,7 +166,7 @@ export default function App() {
             type="button"
             className="secondary"
             onClick={() => {
-              setMode("login");
+              setView("login");
               setMessage("");
             }}
           >
@@ -184,7 +216,7 @@ export default function App() {
             type="button"
             className="secondary"
             onClick={() => {
-              setMode("reset");
+              setView("reset");
               setMessage("");
             }}
           >

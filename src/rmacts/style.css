@@ -226,3 +226,32 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
   .stat strong { font-size: 20px; }
   .dash-section { padding: 16px 14px; }
 }
+
+/* ===== Profile ===== */
+.profile-panel { max-width: 560px; }
+.photo-section {
+  display: flex; gap: 18px; align-items: flex-start;
+  margin: 12px 0 20px; padding-bottom: 18px;
+  border-bottom: 1px solid #e1e7ef;
+}
+.photo-preview {
+  width: 110px; height: 110px; border-radius: 14px; overflow: hidden;
+  border: 2px solid #cbd5e1; background: #f1f5f9; flex-shrink: 0;
+  display: grid; place-items: center;
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder { font-size: 12px; color: #94a3b8; }
+.photo-upload { flex: 1; }
+.photo-upload label { margin-top: 0; }
+.photo-upload .muted { font-size: 12px; margin: 4px 0 8px; }
+.error-msg { color: #b42318; font-size: 13px; }
+.avatar-img {
+  width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(255,183,3,0.4); flex-shrink: 0;
+}
+.dash-username { color: #e8f0fb; font-size: 14px; font-weight: 600; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 520px) {
+  .photo-section { flex-direction: column; align-items: center; text-align: center; }
+  .photo-upload { width: 100%; }
+  .dash-username { display: none; }
+}

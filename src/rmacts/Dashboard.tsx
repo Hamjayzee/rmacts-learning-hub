@@ -3,9 +3,10 @@ import type { User } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
 import AdminDashboard, { type Material } from "./AdminDashboard";
+import StudentProfile, { loadProfileData, type ProfileData } from "./StudentProfile";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 
-type Tab = "overview" | "library" | "quizzes" | "manage" | "students";
+type Tab = "overview" | "library" | "quizzes" | "manage" | "students" | "profile";
 
 function kindOf(m: Material): { label: string; cls: string } {
   if (m.isQuiz) return { label: "Quiz", cls: "quiz" };
@@ -44,6 +45,7 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const isAdmin = role === "admin";
 
   async function load() {
@@ -58,7 +60,16 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, []);
+
+  async function loadUserProfile() {
+    const p = await loadProfileData(user.uid);
+    setProfile(p);
+  }
+
+  useEffect(() => {
+    load();
+    loadUserProfile();
+  }, []);
 
   const resources = materials.filter(m => !m.isQuiz);
   const quizzes = materials.filter(m => m.isQuiz);
@@ -68,11 +79,14 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
     return q ? list.filter(m => `${m.title} ${m.description}`.toLowerCase().includes(q)) : list;
   }, [materials, tab, query]);
 
-  const name = (user.email || "").split("@")[0] ?? "";
+  const displayName = profile?.surname
+    ? `${profile.surname} ${profile.otherNames}`.trim()
+    : (user.email || "").split("@")[0] ?? "";
   const tabs: { id: Tab; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "library", label: "Library" },
     { id: "quizzes", label: "Quizzes" },
+    { id: "profile", label: "My Profile" },
     ...(isAdmin ? [{ id: "manage" as Tab, label: "Manage Content" }, { id: "students" as Tab, label: "Students" }] : []),
   ];
 
@@ -84,7 +98,12 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
           <span>RMACTS Learning Hub</span>
         </div>
         <div className="dash-user">
-          <span className="avatar">{name.charAt(0).toUpperCase()}</span>
+          {profile?.photoUrl ? (
+            <img src={profile.photoUrl} alt="" className="avatar-img" />
+          ) : (
+            <span className="avatar">{displayName.charAt(0).toUpperCase()}</span>
+          )}
+          <span className="dash-username">{displayName}</span>
           <button className="ghost" onClick={onLogout}>Log out</button>
         </div>
       </header>
@@ -102,7 +121,7 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
           <>
             <section className="hero-card">
               <p className="eyebrow">{isAdmin ? "Administrator" : "Student"}</p>
-              <h2>Welcome back, {name}</h2>
+              <h2>Welcome back, {displayName}</h2>
               <p>Continue learning with the latest notes, slides and quizzes from RMACTS.</p>
               <button onClick={() => setTab("library")}>Browse library</button>
             </section>
@@ -133,6 +152,15 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
             {loading ? <p className="muted">Loading…</p> : filtered.length === 0
               ? <p className="muted">Nothing here yet.</p>
               : <div className="m-grid">{filtered.map(m => <MaterialCard key={m.id} item={m} />)}</div>}
+          </section>
+        )}
+
+        {tab === "profile" && (
+          <section className="dash-section">
+            <div className="section-head">
+              <h3>My Profile</h3>
+            </div>
+            <StudentProfile user={user} onSaveed={loadUserProfile} />
           </section>
         )}
 
