@@ -76,7 +76,7 @@ export default function App() {
 
       setUser(result.user);
       setRole(profile.data()?.["role"] || "student");
-      setMessage("Welcome to RMACTS Learning Box!");
+      setMessage("Welcome to RMACTS Learning Hub!");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }
@@ -99,7 +99,7 @@ export default function App() {
   if (user) {
     return (
       <main className="container">
-        <h1>RMACTS Learning Box</h1>
+        <h1>RMACTS Learning Hub</h1>
         <p>Welcome, {user.email}</p>
         <p>Account type: {role}</p>
 
@@ -166,7 +166,7 @@ export default function App() {
     return (
       <main className="container">
         <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
-        <h1>RMACTS Learning Box</h1>
+        <h1>RMACTS Learning Hub</h1>
         <p>Your learning resources, all in one place.</p>
 
         <form className="panel" onSubmit={handleReset}>
@@ -204,7 +204,7 @@ export default function App() {
   return (
     <main className="container">
       <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
-      <h1>RMACTS Learning Box</h1>
+      <h1>RMACTS Learning Hub</h1>
       <p>Your learning resources, all in one place.</p>
 
       <form className="panel" onSubmit={handleSubmit}>
