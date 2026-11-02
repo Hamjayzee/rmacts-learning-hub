@@ -1,26 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "./firebase";
+import { supabase, fetchMaterials, openMaterialFile, type Material } from "./cloud";
 
-export type Material = {
-  id: string;
-  title?: string;
-  description?: string;
-  link?: string;
-  fileUrl?: string;
-  fileName?: string;
-  isQuiz?: boolean;
-};
-type Student = { id: string; email?: string; role?: string };
+type Student = { id: string; email?: string; name?: string; role?: string };
 
 const ACCEPTED_FILE_TYPES =
   ".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation";
@@ -39,19 +20,28 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
 
   async function loadMaterials() {
     try {
-      const snap = await getDocs(collection(db, "materials"));
-      setMaterials(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setMaterials(await fetchMaterials());
     } catch {
-      setMessage("Could not load materials. Check Firestore rules.");
+      setMessage("Could not load materials.");
     }
   }
 
   async function loadStudents() {
     try {
-      const snap = await getDocs(collection(db, "users"));
-      setStudents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const [{ data: profiles, error }, { data: roles }] = await Promise.all([
+        supabase.from("profiles").select("id,email,surname,other_names"),
+        supabase.from("user_roles").select("user_id,role"),
+      ]);
+      if (error) throw error;
+      const admins = new Set((roles ?? []).filter(r => r.role === "admin").map(r => r.user_id));
+      setStudents((profiles ?? []).map(p => ({
+        id: p.id,
+        email: p.email ?? undefined,
+        name: `${p.surname} ${p.other_names}`.trim(),
+        role: admins.has(p.id) ? "admin" : "student",
+      })));
     } catch {
-      setMessage("Could not load students. Check Firestore rules.");
+      setMessage("Could not load students.");
     }
   }
 
@@ -76,36 +66,37 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
     setMessage("Saving...");
 
     try {
-      const data: Record<string, unknown> = {
+      const data: { title: string; description: string; link: string; is_quiz: boolean; file_url?: string; file_name?: string } = {
         title: title.trim(),
         description: description.trim(),
         link: link.trim(),
-        isQuiz,
+        is_quiz: isQuiz,
       };
 
       if (file) {
         setMessage("Uploading file...");
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const fileRef = ref(storage, `materials/${Date.now()}-${safeName}`);
-        await uploadBytes(fileRef, file);
-        data["fileUrl"] = await getDownloadURL(fileRef);
-        data["fileName"] = file.name;
+        const path = `${Date.now()}-${safeName}`;
+        const { error: upErr } = await supabase.storage.from("materials").upload(path, file, { contentType: file.type || undefined });
+        if (upErr) throw upErr;
+        data.file_url = path;
+        data.file_name = file.name;
       }
 
       if (editingId) {
-        await updateDoc(doc(db, "materials", editingId), data);
+        const { error } = await supabase.from("materials").update(data).eq("id", editingId);
+        if (error) throw error;
         setMessage("Material updated.");
       } else {
-        await addDoc(collection(db, "materials"), { ...data, createdAt: serverTimestamp() });
+        const { error } = await supabase.from("materials").insert(data);
+        if (error) throw error;
         setMessage("Material added.");
       }
       resetForm();
       loadMaterials();
       onChange?.();
-    } catch {
-      setMessage(
-        "Could not save. If you attached a file, check that Firebase Storage is enabled and its rules allow admins to write."
-      );
+    } catch (err) {
+      setMessage(`Could not save: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setBusy(false);
     }
@@ -114,12 +105,14 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
   async function handleDelete(item: Material) {
     if (!window.confirm(`Delete "${item.title || "Untitled material"}"?`)) return;
     try {
-      await deleteDoc(doc(db, "materials", item.id));
+      const { error } = await supabase.from("materials").delete().eq("id", item.id);
+      if (error) throw error;
+      if (item.fileUrl && !item.fileUrl.startsWith("http")) await supabase.storage.from("materials").remove([item.fileUrl]);
       setMessage("Material deleted.");
       loadMaterials();
       onChange?.();
     } catch {
-      setMessage("Could not delete. Check Firestore rules.");
+      setMessage("Could not delete.");
     }
   }
 
@@ -135,7 +128,7 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
           {studentList.map((s, i) => (
             <div className="row" key={s.id}>
               <span className="avatar sm">{(s.email || "?").charAt(0).toUpperCase()}</span>
-              <span className="row-main">{s.email || s.id}</span>
+              <span className="row-main">{s.name ? `${s.name} — ` : ""}{s.email || s.id}</span>
               <span className="muted">#{i + 1}</span>
             </div>
           ))}
@@ -195,9 +188,9 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
           <p>{item.description || ""}</p>
           {item.fileUrl && (
             <p>
-              <a href={item.fileUrl} target="_blank" rel="noreferrer">
+              <button type="button" className="link-btn" onClick={() => openMaterialFile(item.fileUrl!)}>
                 Open file{item.fileName ? `: ${item.fileName}` : ""}
-              </a>
+              </button>
             </p>
           )}
           {item.link && (

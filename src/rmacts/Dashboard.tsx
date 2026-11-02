@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import type { User } from "firebase/auth";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "./firebase";
-import AdminDashboard, { type Material } from "./AdminDashboard";
+import AdminDashboard from "./AdminDashboard";
+import { fetchMaterials, openMaterialFile, signedUrl, type AppUser, type Material } from "./cloud";
 import StudentProfile, { loadProfileData, type ProfileData } from "./StudentProfile";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 
@@ -27,7 +25,7 @@ export function MaterialCard({ item }: { item: Material }) {
       {item.description && <p>{item.description}</p>}
       <div className="m-actions">
         {item.fileUrl && (
-          <a className="m-btn" href={item.fileUrl} target="_blank" rel="noreferrer">Open file</a>
+          <button type="button" className="m-btn" onClick={() => openMaterialFile(item.fileUrl!)}>Open file</button>
         )}
         {item.link && (
           <a className="m-btn" href={item.link} target="_blank" rel="noreferrer">
@@ -39,7 +37,7 @@ export function MaterialCard({ item }: { item: Material }) {
   );
 }
 
-export default function Dashboard({ user, role, onLogout }: { user: User; role: string; onLogout: () => void }) {
+export default function Dashboard({ user, role, onLogout }: { user: AppUser; role: string; onLogout: () => void }) {
   const [tab, setTab] = useState<Tab>("overview");
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,11 +49,10 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
   async function load() {
     setLoading(true);
     try {
-      const snap = await getDocs(collection(db, "materials"));
-      setMaterials(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setMaterials(await fetchMaterials());
       setError("");
     } catch {
-      setError("Could not load materials. Check Firestore rules.");
+      setError("Could not load materials. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,6 +60,7 @@ export default function Dashboard({ user, role, onLogout }: { user: User; role: 
 
   async function loadUserProfile() {
     const p = await loadProfileData(user.uid);
+    if (p?.photoUrl) p.photoUrl = await signedUrl("profile-photos", p.photoUrl);
     setProfile(p);
   }
 

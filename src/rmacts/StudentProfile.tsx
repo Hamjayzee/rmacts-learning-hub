@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import type { User } from "firebase/auth";
+import { supabase, signedUrl, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 
 type ProfileData = {
@@ -20,12 +20,6 @@ const EMPTY_PROFILE: ProfileData = {
 
 const MAX_PHOTO_BYTES = 1024 * 1024;
 
-async function getFirebase() {
-  const { db, storage } = await import("./firebase");
-  const { doc, getDoc, setDoc } = await import("firebase/firestore");
-  const { ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
-  return { db, storage, doc, getDoc, setDoc, ref, uploadBytes, getDownloadURL };
-}
 
 async function compressImage(file: File, maxBytes: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -73,7 +67,7 @@ export default function StudentProfile({
   user,
   onSaveed,
 }: {
-  user: User;
+  user: AppUser;
   onSaveed: () => void;
 }) {
   const [data, setData] = useState<ProfileData>(EMPTY_PROFILE);
@@ -86,12 +80,10 @@ export default function StudentProfile({
   async function loadProfile() {
     setLoading(true);
     try {
-      const fb = await getFirebase();
-      const snap = await fb.getDoc(fb.doc(fb.db, "profiles", user.uid));
-      if (snap.exists()) {
-        const d = snap.data() as ProfileData;
-        setData({ ...EMPTY_PROFILE, ...d });
-        setPhotoPreview(d.photoUrl || "");
+      const d = await loadProfileData(user.uid);
+      if (d) {
+        setData(d);
+        setPhotoPreview(await signedUrl("profile-photos", d.photoUrl));
       }
     } catch {
       setMessage("Could not load your profile. Please try again.");
@@ -125,17 +117,16 @@ export default function StudentProfile({
     setMessage("Saving your profile...");
 
     try {
-      const fb = await getFirebase();
       let photoUrl = data.photoUrl;
 
       if (photoFile) {
         setMessage("Processing photo...");
         const compressed = await compressImage(photoFile, MAX_PHOTO_BYTES);
         setMessage("Uploading photo...");
-        const safeName = `${user.uid}-${Date.now()}.jpg`;
-        const fileRef = fb.ref(fb.storage, `profile-photos/${safeName}`);
-        await fb.uploadBytes(fileRef, compressed);
-        photoUrl = await fb.getDownloadURL(fileRef);
+        const path = `${user.uid}/${Date.now()}.jpg`;
+        const { error: upErr } = await supabase.storage.from("profile-photos").upload(path, compressed, { contentType: "image/jpeg" });
+        if (upErr) throw upErr;
+        photoUrl = path;
       }
 
       const profileData: ProfileData = {
@@ -146,11 +137,17 @@ export default function StudentProfile({
         photoUrl,
       };
 
-      await fb.setDoc(fb.doc(fb.db, "profiles", user.uid), {
-        ...profileData,
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.uid,
         email: user.email,
-        updatedAt: new Date().toISOString(),
+        surname: profileData.surname,
+        other_names: profileData.otherNames,
+        service_number: profileData.serviceNumber,
+        rate: profileData.rate,
+        photo_url: profileData.photoUrl,
+        updated_at: new Date().toISOString(),
       });
+      if (error) throw error;
 
       setData(profileData);
       setMessage("Profile saved successfully!");
@@ -249,8 +246,13 @@ export default function StudentProfile({
 export { loadProfileData, type ProfileData };
 
 async function loadProfileData(uid: string): Promise<ProfileData | null> {
-  const fb = await getFirebase();
-  const snap = await fb.getDoc(fb.doc(fb.db, "profiles", uid));
-  if (!snap.exists()) return null;
-  return { ...EMPTY_PROFILE, ...(snap.data() as Partial<ProfileData>) };
+  const { data } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
+  if (!data) return null;
+  return {
+    surname: data.surname,
+    otherNames: data.other_names,
+    serviceNumber: data.service_number,
+    rate: data.rate,
+    photoUrl: data.photo_url,
+  };
 }
