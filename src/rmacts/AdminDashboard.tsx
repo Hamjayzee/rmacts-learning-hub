@@ -36,7 +36,7 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
       const admins = new Set((roles ?? []).filter(r => r.role === "admin").map(r => r.user_id));
       setStudents((profiles ?? []).map(p => ({
         id: p.id,
-        email: p.email ?? undefined,
+        email: p.email ?? "",
         name: `${p.surname} ${p.other_names}`.trim(),
         role: admins.has(p.id) ? "admin" : "student",
       })));
@@ -77,7 +77,7 @@ export default function AdminDashboard({ view, onChange }: { view: "manage" | "s
         setMessage("Uploading file...");
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `${Date.now()}-${safeName}`;
-        const { error: upErr } = await supabase.storage.from("materials").upload(path, file, { contentType: file.type || undefined });
+        const { error: upErr } = await supabase.storage.from("materials").upload(path, file, { contentType: file.type || "application/octet-stream" });
         if (upErr) throw upErr;
         data.file_url = path;
         data.file_name = file.name;
