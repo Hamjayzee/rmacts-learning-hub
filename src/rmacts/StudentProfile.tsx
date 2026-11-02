@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
 import { supabase, signedUrl, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 
@@ -92,7 +92,7 @@ export default function StudentProfile({
     }
   }
 
-  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
