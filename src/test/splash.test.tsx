@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import Splash, { SPLASH_MS } from "@/rmacts/Splash";
@@ -21,10 +21,14 @@ describe("Splash loading screen", () => {
     expect(SPLASH_MS).toBe(8000);
     expect(onDone).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(SPLASH_MS - 200);
+    act(() => {
+      vi.advanceTimersByTime(SPLASH_MS - 200);
+    });
     expect(onDone).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(300);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 });
