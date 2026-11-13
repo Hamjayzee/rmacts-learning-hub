@@ -55,7 +55,10 @@ export default function Splash({ onDone }: { onDone: () => void }) {
 
       <div className="splash-card">
         <img src={logoUrl.url} alt="RMACTS logo" className="splash-logo" />
-        <h1 className="splash-title">RMACTS Learning Hub</h1>
+        <p className="splash-eyebrow">RMACTS</p>
+        <h1 className="splash-title">
+          Regional Maritime Awareness Capability Training School
+        </h1>
         <p className="splash-sub">Maritime communication and technology learning, all in one place.</p>
 
         <div className="splash-track" aria-hidden="true">
