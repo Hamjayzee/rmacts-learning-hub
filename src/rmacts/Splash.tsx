@@ -37,7 +37,7 @@ export default function Splash({ onDone }: { onDone: () => void }) {
       className="splash"
       role="status"
       aria-live="polite"
-      aria-label="Loading RMACTS Learning Hub"
+      aria-label="Loading Regional Maritime Awareness Capability Training School"
       style={{
         backgroundImage: `linear-gradient(rgba(8, 20, 38, 0.82), rgba(8, 20, 38, 0.9)), url(${radarUrl.url})`,
       }}

@@ -340,7 +340,6 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 @media (max-width: 420px) {
   .splash-card { padding: 26px 18px 20px; }
   .splash-logo { width: 108px; }
-  .splash-title { font-size: 22px; }
 }
 
 /* ===== Radar simulation on the loading page ===== */
