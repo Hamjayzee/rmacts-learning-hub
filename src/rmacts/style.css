@@ -255,3 +255,72 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
   .photo-upload { width: 100%; }
   .dash-username { display: none; }
 }
+
+/* ===== Splash / loading screen ===== */
+.splash {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 18px;
+  text-align: center;
+}
+.splash-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 34px 26px 26px;
+  border-radius: 20px;
+  background: rgba(8, 20, 38, 0.82);
+  border: 1px solid rgba(255, 183, 3, 0.28);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+}
+.splash-logo {
+  display: block;
+  width: 132px;
+  height: auto;
+  margin: 0 auto 14px;
+  border-radius: 18px;
+  background: #06090f;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+.splash-title {
+  margin: 0 0 6px;
+  color: #ffb703;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(6, 12, 22, 0.85);
+}
+.splash-sub {
+  margin: 0 0 22px;
+  color: #c5d3e6;
+  font-size: 14px;
+}
+.splash-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+.splash-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffb703, #ffd166);
+  box-shadow: 0 0 14px rgba(255, 183, 3, 0.55);
+  transition: width 0.12s linear;
+}
+.splash-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #b9c7da;
+}
+.splash-pct { font-weight: 700; color: #ffb703; }
+@media (max-width: 420px) {
+  .splash-card { padding: 26px 18px 20px; }
+  .splash-logo { width: 108px; }
+  .splash-title { font-size: 22px; }
+}

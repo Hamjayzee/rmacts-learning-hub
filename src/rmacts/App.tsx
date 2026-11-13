@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 
 import Dashboard from "./Dashboard";
+import Splash from "./Splash";
 import StudentProfile, { loadProfileData } from "./StudentProfile";
 import { supabase, getRole, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
@@ -16,6 +17,7 @@ export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [role, setRole] = useState("student");
   const [view, setView] = useState<View>("login");
+  const [booting, setBooting] = useState(true);
 
   async function enter(u: { id: string; email?: string | null }) {
     const appUser = { uid: u.id, email: u.email ?? null };
@@ -102,6 +104,10 @@ export default function App() {
     setView("login");
     setMessage("");
     setMode("login");
+  }
+
+  if (booting) {
+    return <Splash onDone={() => setBooting(false)} />;
   }
 
   if (user && view === "profile") {
