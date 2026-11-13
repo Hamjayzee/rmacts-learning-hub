@@ -150,64 +150,70 @@ export default function App() {
 
   if (view === "newpass") {
     return (
-      <main className="container">
-        {header}
-        <form className="panel" onSubmit={handleNewPassword}>
-          <h2>Choose a New Password</h2>
-          <label>New Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="At least 6 characters" />
-          <button type="submit">Save New Password</button>
-          <p>{message}</p>
-        </form>
-      </main>
+      <PageShell>
+        <main className="container">
+          {header}
+          <form className="panel" onSubmit={handleNewPassword}>
+            <h2>Choose a New Password</h2>
+            <label>New Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="At least 6 characters" />
+            <button type="submit">Save New Password</button>
+            <p>{message}</p>
+          </form>
+        </main>
+      </PageShell>
     );
   }
 
   if (view === "reset") {
     return (
-      <main className="container">
-        {header}
-        <form className="panel" onSubmit={handleReset}>
-          <h2>Reset Password</h2>
-          <p>Enter your account email and we'll send you a link to choose a new password.</p>
-          <label>Email Address</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="Enter your email" />
-          <button type="submit">Send Reset Link</button>
-          <p>{message}</p>
-          <button type="button" className="secondary" onClick={() => { setView("login"); setMessage(""); }}>
-            Back to Login
-          </button>
-        </form>
-      </main>
+      <PageShell>
+        <main className="container">
+          {header}
+          <form className="panel" onSubmit={handleReset}>
+            <h2>Reset Password</h2>
+            <p>Enter your account email and we'll send you a link to choose a new password.</p>
+            <label>Email Address</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="Enter your email" />
+            <button type="submit">Send Reset Link</button>
+            <p>{message}</p>
+            <button type="button" className="secondary" onClick={() => { setView("login"); setMessage(""); }}>
+              Back to Login
+            </button>
+          </form>
+        </main>
+      </PageShell>
     );
   }
 
   return (
-    <main className="container">
-      {header}
-      <form className="panel" onSubmit={handleSubmit}>
-        <h2>{mode === "login" ? "Welcome Back" : "Create Student Account"}</h2>
+    <PageShell>
+      <main className="container">
+        {header}
+        <form className="panel" onSubmit={handleSubmit}>
+          <h2>{mode === "login" ? "Welcome Back" : "Create Student Account"}</h2>
 
-        <label>Email Address</label>
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="Enter your email" />
+          <label>Email Address</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="Enter your email" />
 
-        <label>Password</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="At least 6 characters" />
+          <label>Password</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="At least 6 characters" />
 
-        <button type="submit">{mode === "login" ? "Log In" : "Register as Student"}</button>
+          <button type="submit">{mode === "login" ? "Log In" : "Register as Student"}</button>
 
-        <p>{message}</p>
+          <p>{message}</p>
 
-        {mode === "login" && (
-          <button type="button" className="secondary" onClick={() => { setView("reset"); setMessage(""); }}>
-            Forgot Password?
+          {mode === "login" && (
+            <button type="button" className="secondary" onClick={() => { setView("reset"); setMessage(""); }}>
+              Forgot Password?
+            </button>
+          )}
+
+          <button type="button" className="secondary" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMessage(""); }}>
+            {mode === "login" ? "Create Student Account" : "Back to Login"}
           </button>
-        )}
-
-        <button type="button" className="secondary" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMessage(""); }}>
-          {mode === "login" ? "Create Student Account" : "Back to Login"}
-        </button>
-      </form>
-    </main>
+        </form>
+      </main>
+    </PageShell>
   );
 }
