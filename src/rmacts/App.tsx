@@ -15,7 +15,7 @@ function PageShell({ children }: { children: ReactNode }) {
     <div
       className="page-bg"
       style={{
-        backgroundImage: `linear-gradient(rgba(8, 20, 38, 0.84), rgba(8, 20, 38, 0.92)), url(${opsUrl.url})`,
+        backgroundImage: `linear-gradient(rgba(8, 20, 38, 0.58), rgba(8, 20, 38, 0.8)), url(${opsUrl.url})`,
       }}
     >
       {children}
