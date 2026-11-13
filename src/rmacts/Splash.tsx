@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
+import radarUrl from "./assets/radar.jpg.asset.json";
 
 export const SPLASH_MS = 8000;
 
@@ -32,7 +33,15 @@ export default function Splash({ onDone }: { onDone: () => void }) {
   const step = STEPS[Math.min(STEPS.length - 1, Math.floor((pct / 100) * STEPS.length))];
 
   return (
-    <main className="splash" role="status" aria-live="polite" aria-label="Loading RMACTS Learning Hub">
+    <main
+      className="splash"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading RMACTS Learning Hub"
+      style={{
+        backgroundImage: `linear-gradient(rgba(8, 20, 38, 0.82), rgba(8, 20, 38, 0.9)), url(${radarUrl.url})`,
+      }}
+    >
       <div className="splash-card">
         <img src={logoUrl.url} alt="RMACTS logo" className="splash-logo" />
         <h1 className="splash-title">RMACTS Learning Hub</h1>
