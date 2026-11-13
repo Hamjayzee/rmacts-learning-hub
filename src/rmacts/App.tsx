@@ -1,13 +1,27 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
 import Dashboard from "./Dashboard";
 import Splash from "./Splash";
 import StudentProfile, { loadProfileData } from "./StudentProfile";
 import { supabase, getRole, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
+import opsUrl from "./assets/operations-room.jpg.asset.json";
 import "./style.css";
 
 type View = "login" | "reset" | "newpass" | "profile" | "dashboard";
+
+function PageShell({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="page-bg"
+      style={{
+        backgroundImage: `linear-gradient(rgba(8, 20, 38, 0.84), rgba(8, 20, 38, 0.92)), url(${opsUrl.url})`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function App() {
   const [mode, setMode] = useState<"login" | "register">("login");

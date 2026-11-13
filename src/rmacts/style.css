@@ -256,6 +256,14 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
   .dash-username { display: none; }
 }
 
+/* ===== Menu / login page background ===== */
+.page-bg {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* ===== Splash / loading screen ===== */
 .splash {
   min-height: 100vh;
