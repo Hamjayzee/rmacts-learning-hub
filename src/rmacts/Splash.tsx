@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 
-const SPLASH_MS = 8000;
+export const SPLASH_MS = 8000;
 
 const STEPS = [
   "Preparing your learning hub…",
@@ -16,25 +16,17 @@ export default function Splash({ onDone }: { onDone: () => void }) {
   const done = useRef(false);
 
   useEffect(() => {
-    const start = performance.now();
-    let frame = 0;
-
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(1, elapsed / SPLASH_MS);
+    const start = Date.now();
+    const id = setInterval(() => {
+      const progress = Math.min(1, (Date.now() - start) / SPLASH_MS);
       setPct(Math.round(progress * 100));
-      if (progress >= 1) {
-        if (!done.current) {
-          done.current = true;
-          onDone();
-        }
-        return;
+      if (progress >= 1 && !done.current) {
+        done.current = true;
+        clearInterval(id);
+        onDone();
       }
-      frame = requestAnimationFrame(tick);
-    };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    }, 50);
+    return () => clearInterval(id);
   }, [onDone]);
 
   const step = STEPS[Math.min(STEPS.length - 1, Math.floor((pct / 100) * STEPS.length))];
