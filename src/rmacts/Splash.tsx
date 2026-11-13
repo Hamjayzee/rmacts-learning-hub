@@ -42,6 +42,17 @@ export default function Splash({ onDone }: { onDone: () => void }) {
         backgroundImage: `linear-gradient(rgba(8, 20, 38, 0.82), rgba(8, 20, 38, 0.9)), url(${radarUrl.url})`,
       }}
     >
+      <div className="radar-sim" aria-hidden="true">
+        <div className="radar-scope">
+          <div className="radar-rings" />
+          <div className="radar-cross" />
+          <div className="radar-sweep" />
+          <span className="radar-blip b1" />
+          <span className="radar-blip b2" />
+          <span className="radar-blip b3" />
+        </div>
+      </div>
+
       <div className="splash-card">
         <img src={logoUrl.url} alt="RMACTS logo" className="splash-logo" />
         <h1 className="splash-title">RMACTS Learning Hub</h1>

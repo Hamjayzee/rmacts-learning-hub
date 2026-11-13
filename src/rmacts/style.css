@@ -259,6 +259,8 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 
 /* ===== Splash / loading screen ===== */
 .splash {
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   display: grid;
   place-items: center;
@@ -269,6 +271,8 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
   background-repeat: no-repeat;
 }
 .splash-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 460px;
   padding: 34px 26px 26px;
