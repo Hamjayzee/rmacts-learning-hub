@@ -16,12 +16,7 @@ describe("Splash loading screen", () => {
     const onDone = vi.fn();
     const { container } = render(<Splash onDone={onDone} />);
 
-    expect(
-      screen.getByRole("status", {
-        name: "Loading Regional Maritime Awareness Capability Training School",
-      }),
-    ).toBeTruthy();
-    expect(screen.getByText("Regional Maritime Awareness Capability Training School")).toBeTruthy();
+    expect(screen.getByRole("status", { name: "Loading RMACTS Learning Hub" })).toBeTruthy();
     expect(container.querySelector(".splash-fill")).toBeTruthy();
     expect(SPLASH_MS).toBe(8000);
     expect(onDone).not.toHaveBeenCalled();
