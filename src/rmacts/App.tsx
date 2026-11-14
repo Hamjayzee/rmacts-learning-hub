@@ -6,6 +6,7 @@ import StudentProfile, { loadProfileData } from "./StudentProfile";
 import { supabase, getRole, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 import opsUrl from "./assets/operations-room.jpg.asset.json";
+import radarUrl from "./assets/radar.jpg.asset.json";
 import "./style.css";
 
 type View = "menu" | "about" | "gallery" | "history" | "contact" | "login" | "reset" | "newpass" | "profile" | "dashboard";
@@ -312,6 +313,10 @@ export default function App() {
 
           <button type="button" className="secondary" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMessage(""); }}>
             {mode === "login" ? "Create Student Account" : "Back to Login"}
+          </button>
+
+          <button type="button" className="secondary" onClick={() => { setView("menu"); setMessage(""); }}>
+            Back to Menu
           </button>
         </form>
       </main>
