@@ -148,6 +148,107 @@ export default function App() {
     </>
   );
 
+  if (view === "menu") {
+    return (
+      <PageShell>
+        <main className="container">
+          {header}
+          <div className="menu-grid">
+            <button type="button" className="menu-card" onClick={() => setView("about")}>
+              <span className="menu-icon" aria-hidden="true">ℹ️</span>
+              <span className="menu-label">About</span>
+              <span className="menu-desc">Who we are and what we do</span>
+            </button>
+            <button type="button" className="menu-card" onClick={() => setView("gallery")}>
+              <span className="menu-icon" aria-hidden="true">🖼️</span>
+              <span className="menu-label">Gallery</span>
+              <span className="menu-desc">Photos from our training</span>
+            </button>
+            <button type="button" className="menu-card" onClick={() => setView("history")}>
+              <span className="menu-icon" aria-hidden="true">📜</span>
+              <span className="menu-label">History</span>
+              <span className="menu-desc">Our story so far</span>
+            </button>
+            <button type="button" className="menu-card" onClick={() => setView("contact")}>
+              <span className="menu-icon" aria-hidden="true">✉️</span>
+              <span className="menu-label">Contact Us</span>
+              <span className="menu-desc">Get in touch with the school</span>
+            </button>
+          </div>
+          <button type="button" className="menu-login" onClick={() => { setView("login"); setMessage(""); }}>
+            Continue to Login
+          </button>
+        </main>
+      </PageShell>
+    );
+  }
+
+  if (view === "about" || view === "gallery" || view === "history" || view === "contact") {
+    return (
+      <PageShell>
+        <main className="container">
+          {header}
+          <div className="panel info-page">
+            {view === "about" && (
+              <>
+                <h2>About RMACTS</h2>
+                <p>
+                  The Regional Maritime Awareness Capability Training School (RMACTS) trains
+                  personnel in maritime awareness, communication and technology. Our Learning
+                  Hub brings course materials, quizzes and assessments together in one place
+                  so students can study anytime, anywhere.
+                </p>
+              </>
+            )}
+            {view === "gallery" && (
+              <>
+                <h2>Gallery</h2>
+                <div className="gallery-grid">
+                  <figure>
+                    <img src={opsUrl.url} alt="Maritime operations room" />
+                    <figcaption>Operations room training</figcaption>
+                  </figure>
+                  <figure>
+                    <img src={radarUrl.url} alt="Radar scope display" />
+                    <figcaption>Radar and surveillance systems</figcaption>
+                  </figure>
+                  <figure>
+                    <img src={logoUrl.url} alt="RMACTS badge" />
+                    <figcaption>The RMACTS badge</figcaption>
+                  </figure>
+                </div>
+              </>
+            )}
+            {view === "history" && (
+              <>
+                <h2>Our History</h2>
+                <p>
+                  RMACTS was established to build regional maritime awareness capability
+                  through practical, hands-on training. Over the years the school has grown
+                  from classroom instruction into a full learning hub, combining lessons,
+                  documents and quizzes for every student.
+                </p>
+              </>
+            )}
+            {view === "contact" && (
+              <>
+                <h2>Contact Us</h2>
+                <p>
+                  For questions about courses, enrolment or your account, please reach out
+                  to the school administration or speak with your instructor. Students can
+                  also use the Learning Hub after logging in to access support materials.
+                </p>
+              </>
+            )}
+            <button type="button" className="secondary" onClick={() => setView("menu")}>
+              Back to Menu
+            </button>
+          </div>
+        </main>
+      </PageShell>
+    );
+  }
+
   if (view === "newpass") {
     return (
       <PageShell>
