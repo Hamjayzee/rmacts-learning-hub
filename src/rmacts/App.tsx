@@ -8,7 +8,7 @@ import logoUrl from "./assets/rmacts-logo.png.asset.json";
 import opsUrl from "./assets/operations-room.jpg.asset.json";
 import "./style.css";
 
-type View = "login" | "reset" | "newpass" | "profile" | "dashboard";
+type View = "menu" | "about" | "gallery" | "history" | "contact" | "login" | "reset" | "newpass" | "profile" | "dashboard";
 
 function PageShell({ children }: { children: ReactNode }) {
   return (
@@ -30,7 +30,7 @@ export default function App() {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<AppUser | null>(null);
   const [role, setRole] = useState("student");
-  const [view, setView] = useState<View>("login");
+  const [view, setView] = useState<View>("menu");
   const [booting, setBooting] = useState(true);
 
   async function enter(u: { id: string; email?: string | null }) {
