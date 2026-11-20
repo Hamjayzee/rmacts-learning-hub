@@ -40,10 +40,10 @@ export default function MenuPage({ onNavigate }: { onNavigate: (destination: Men
           <Button className="school-cover-login" onClick={() => onNavigate("login")}>Continue to Login <ArrowRight /></Button>
         </div>
         <div className="school-cover-footer"><span>REGIONAL MARITIME AWARENESS CAPABILITY</span><span>RMACTS · LEARNING HUB</span></div>
+        <nav className="school-section-nav" aria-label="Explore the school">
+          {links.map((link, index) => <Button variant="ghost" key={link.destination} onClick={() => onNavigate(link.destination)}><span className="school-nav-number">0{index + 1}</span>{link.label}<ArrowRight /></Button>)}
+        </nav>
       </section>
-      <nav className="school-section-nav" aria-label="Explore the school">
-        {links.map((link, index) => <Button variant="ghost" key={link.destination} onClick={() => onNavigate(link.destination)}><span className="school-nav-number">0{index + 1}</span>{link.label}<ArrowRight /></Button>)}
-      </nav>
     </main>
   );
 }
