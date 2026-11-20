@@ -12,7 +12,7 @@ describe("Splash loading screen", () => {
     vi.useRealTimers();
   });
 
-  it("shows a loading bar and only hands over to the menu after 8 seconds", () => {
+  it("shows only the animated bars and hands over to the menu after 10 seconds", () => {
     const onDone = vi.fn();
     const { container } = render(<Splash onDone={onDone} />);
 
@@ -21,8 +21,12 @@ describe("Splash loading screen", () => {
         name: "Loading Regional Maritime Awareness Capability Training School",
       }),
     ).toBeTruthy();
-    expect(container.querySelector(".splash-fill")).toBeTruthy();
-    expect(SPLASH_MS).toBe(8000);
+    expect(container.querySelectorAll(".splash-bars span")).toHaveLength(9);
+    expect(container.querySelector(".splash-fill")).toBeNull();
+    expect(container.querySelector(".splash-track")).toBeNull();
+    expect(container.querySelector(".splash-meta")).toBeNull();
+    expect(container.textContent).not.toContain("%");
+    expect(SPLASH_MS).toBe(10000);
     expect(onDone).not.toHaveBeenCalled();
 
     act(() => {

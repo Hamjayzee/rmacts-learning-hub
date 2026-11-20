@@ -329,7 +329,7 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 .splash-logo { display: block; width: min(66vw, 310px); height: auto; margin: 0 auto 30px; animation: crest-reveal 1s ease-out both; }
 .splash-title { max-width: 540px; margin: 0 auto 30px; color: var(--school-paper); font-size: 21px; font-weight: 600; line-height: 1.5; letter-spacing: 0; text-shadow: none; text-wrap: balance; }
 .splash-loading { color: var(--school-paper); font-size: 22px; margin: 0 0 22px; letter-spacing: 0; }
-.splash-bars { display: flex; justify-content: center; align-items: center; gap: 15px; height: 48px; margin-bottom: 28px; }
+.splash-bars { display: flex; justify-content: center; align-items: center; gap: 15px; height: 48px; }
 .splash-bars span { width: 3px; height: 40px; border-radius: 2px; background: var(--school-paper); animation: loading-bars 1.2s ease-in-out infinite; }
 .splash-bars span:nth-child(2) { animation-delay: .12s; }
 .splash-bars span:nth-child(3) { animation-delay: .24s; }
@@ -339,10 +339,6 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 .splash-bars span:nth-child(7) { animation-delay: .72s; }
 .splash-bars span:nth-child(8) { animation-delay: .84s; }
 .splash-bars span:nth-child(9) { animation-delay: .96s; }
-.splash-track { max-width: 280px; height: 2px; margin: auto; background: var(--school-line); overflow: hidden; }
-.splash-fill { height: 100%; background: var(--school-gold); transition: width .12s linear; }
-.splash-meta { display: flex; justify-content: space-between; gap: 14px; max-width: 280px; margin: 10px auto 0; color: var(--school-muted); font-size: 10px; }
-.splash-pct { color: var(--school-gold); }
 @keyframes loading-bars { 0%, 100% { opacity: .12; transform: scaleY(.45); } 45% { opacity: 1; transform: scaleY(1); } }
 @keyframes crest-reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -417,5 +413,4 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 @media (prefers-reduced-motion: reduce) {
   .splash-logo, .splash-bars span, .school-cover-content { animation: none; }
   .splash-bars span { opacity: .75; }
-  .splash-fill { transition: none; }
 }
