@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
 import Dashboard from "./Dashboard";
 import Splash from "./Splash";
+import MenuPage from "./MenuPage";
 import StudentProfile, { loadProfileData } from "./StudentProfile";
 import { supabase, getRole, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
@@ -150,38 +151,7 @@ export default function App() {
   );
 
   if (view === "menu") {
-    return (
-      <PageShell>
-        <main className="container">
-          {header}
-          <div className="menu-grid">
-            <button type="button" className="menu-card" onClick={() => setView("about")}>
-              <span className="menu-icon" aria-hidden="true">ℹ️</span>
-              <span className="menu-label">About</span>
-              <span className="menu-desc">Who we are and what we do</span>
-            </button>
-            <button type="button" className="menu-card" onClick={() => setView("gallery")}>
-              <span className="menu-icon" aria-hidden="true">🖼️</span>
-              <span className="menu-label">Gallery</span>
-              <span className="menu-desc">Photos from our training</span>
-            </button>
-            <button type="button" className="menu-card" onClick={() => setView("history")}>
-              <span className="menu-icon" aria-hidden="true">📜</span>
-              <span className="menu-label">History</span>
-              <span className="menu-desc">Our story so far</span>
-            </button>
-            <button type="button" className="menu-card" onClick={() => setView("contact")}>
-              <span className="menu-icon" aria-hidden="true">✉️</span>
-              <span className="menu-label">Contact Us</span>
-              <span className="menu-desc">Get in touch with the school</span>
-            </button>
-          </div>
-          <button type="button" className="menu-login" onClick={() => { setView("login"); setMessage(""); }}>
-            Continue to Login
-          </button>
-        </main>
-      </PageShell>
-    );
+    return <MenuPage onNavigate={destination => { setView(destination); setMessage(""); }} />;
   }
 
   if (view === "about" || view === "gallery" || view === "history" || view === "contact") {

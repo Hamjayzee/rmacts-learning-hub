@@ -62,6 +62,14 @@
 }
 
 :root {
+  --school-black: oklch(0 0 0);
+  --school-ink: oklch(0.28 0.07 250);
+  --school-paper: oklch(0.98 0.003 250);
+  --school-gold: oklch(0.83 0.16 88);
+  --school-red: oklch(0.53 0.2 28);
+  --school-muted: oklch(0.74 0.018 250);
+  --school-line: oklch(1 0 0 / 18%);
+  --school-overlay: oklch(0.16 0.03 250 / 52%);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
