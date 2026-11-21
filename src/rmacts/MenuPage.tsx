@@ -37,7 +37,6 @@ export default function MenuPage({ onNavigate }: { onNavigate: (destination: Men
           <h1>Regional Maritime Awareness<br className="school-title-break" /> Capability Training School</h1>
           <div className="school-divider" />
           <p className="school-motto">Shared security in the maritime world</p>
-          <Button className="school-cover-login" onClick={() => onNavigate("login")}>Continue to Login <ArrowRight /></Button>
         </div>
         <div className="school-cover-footer"><span>REGIONAL MARITIME AWARENESS CAPABILITY</span><span>RMACTS · LEARNING HUB</span></div>
         <nav className="school-section-nav" aria-label="Explore the school">
