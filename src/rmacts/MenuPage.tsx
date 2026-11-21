@@ -40,7 +40,7 @@ export default function MenuPage({ onNavigate }: { onNavigate: (destination: Men
         </div>
         <div className="school-cover-footer"><span>REGIONAL MARITIME AWARENESS CAPABILITY</span><span>RMACTS · LEARNING HUB</span></div>
         <nav className="school-section-nav" aria-label="Explore the school">
-          {links.map((link, index) => <Button variant="ghost" key={link.destination} onClick={() => onNavigate(link.destination)}><span className="school-nav-number">0{index + 1}</span>{link.label}<ArrowRight /></Button>)}
+          {links.map(link => <Button variant="ghost" key={link.destination} onClick={() => onNavigate(link.destination)}>{link.label}<ArrowRight /></Button>)}
         </nav>
       </section>
     </main>

@@ -356,17 +356,13 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 .school-cover { position: relative; min-height: min(760px, calc(100svh - 190px)); display: flex; align-items: center; padding: 90px 7%; overflow: hidden; color: var(--school-paper); }
 .school-cover-photo, .school-cover-shade { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .school-cover-shade { background: linear-gradient(180deg, var(--school-overlay), color-mix(in oklch, var(--school-ink) 72%, transparent)); }
-.school-cover-content { position: relative; z-index: 1; width: 100%; max-width: min(900px, calc(100% - 300px)); animation: crest-reveal .8s ease-out both; }
+.school-cover-content { position: relative; z-index: 1; width: 100%; max-width: 900px; animation: crest-reveal .8s ease-out both; }
 .school-kicker { color: var(--school-gold); font-size: 11px; font-weight: 600; margin: 0 0 22px; }
 .school-cover h1 { margin: 0; font-size: 46px; font-weight: 800; color: var(--school-paper); line-height: 1.25; letter-spacing: 0; text-shadow: none; text-wrap: balance; }
 .school-divider { width: 55px; height: 3px; background: var(--school-gold); margin: 24px 0; }
 .school-motto { color: var(--school-paper); font-size: 16px; margin: 0 0 30px; }
 .school-cover-footer { position: absolute; bottom: 22px; left: 7%; right: 7%; display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--school-line); padding-top: 18px; font-size: 9px; }
-.school-section-nav { position: absolute; z-index: 2; top: 50%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; width: min(250px, 32vw); border-top: 1px solid var(--school-line); }
-.school-section-nav button { justify-content: flex-end; width: 100%; height: clamp(44px, 8.5svh, 62px); padding: 0 14px; background: transparent; color: var(--school-paper); border-bottom: 1px solid var(--school-line); border-radius: 0; font-size: 14px; text-align: right; }
-.school-section-nav button:hover { background: color-mix(in oklch, var(--school-ink) 45%, transparent); color: var(--school-gold); }
-.school-section-nav button svg { margin-left: 0; width: 15px; height: 15px; opacity: .75; }
-.school-nav-number { color: var(--school-gold); font-size: 10px; margin-right: auto; }
+.school-section-nav { display: none; }
 .school-mobile-nav { display: none; }
 @media (max-width: 900px) {
   .school-desktop-nav { display: none; }
@@ -374,15 +370,11 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
   .school-mobile-nav { display: flex; flex-direction: column; padding: 12px 5% 24px; background: var(--school-paper); border-top: 1px solid color-mix(in oklch, var(--school-ink) 15%, transparent); }
   .school-mobile-nav button { justify-content: space-between; background: transparent; color: var(--school-ink); height: 46px; }
   .school-cover h1 { font-size: 36px; }
-}
-@media (max-width: 820px) {
-  .school-cover { flex-direction: column; align-items: stretch; justify-content: center; }
-  .school-section-nav { position: static; transform: none; width: auto; display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--school-line); padding: 0 5% 22px; margin-top: 26px; }
-  .school-section-nav button { height: 62px; color: var(--school-paper); text-align: left; border-bottom: 1px solid var(--school-line); }
-  .school-section-nav button:nth-child(even) { border-left: 1px solid var(--school-line); padding-left: 18px; }
-  .school-section-nav button:hover { background: color-mix(in oklch, var(--school-ink) 45%, transparent); color: var(--school-gold); }
-  .school-nav-number { color: var(--school-gold); }
   .school-cover-content { max-width: 100%; }
+  .school-section-nav { display: flex; position: absolute; z-index: 2; top: 14px; right: 4%; flex-direction: row; align-items: center; gap: 2px; }
+  .school-section-nav button { justify-content: center; width: auto; height: auto; padding: 7px 9px; background: transparent; color: var(--school-paper); border: 0; border-radius: 0; font-size: 11px; letter-spacing: .5px; text-transform: uppercase; }
+  .school-section-nav button:hover { color: var(--school-gold); background: transparent; }
+  .school-section-nav button svg { display: none; }
 }
 @media (max-width: 520px) {
   .school-welcome { justify-content: flex-end; padding: 10px 5%; }
@@ -400,9 +392,8 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
   .school-motto { font-size: 13px; }
   .school-cover-footer { justify-content: center; font-size: 8px; }
   .school-cover-footer span:first-child { display: none; }
-  .school-section-nav { padding: 0 0 18px; }
-  .school-section-nav button { height: 56px; font-size: 13px; }
-  .school-section-nav button:nth-child(even) { padding-left: 14px; }
+  .school-section-nav { top: 10px; right: 3%; }
+  .school-section-nav button { padding: 5px 6px; font-size: 9px; }
   .splash-logo { width: min(72vw, 285px); margin-bottom: 26px; }
   .splash-title { font-size: 17px; max-width: 340px; margin-bottom: 26px; }
 }
