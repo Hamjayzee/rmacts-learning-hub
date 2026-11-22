@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
 import Dashboard from "./Dashboard";
+import Adjutant from "./Adjutant";
 import Splash from "./Splash";
 import MenuPage from "./MenuPage";
 import StudentProfile, { loadProfileData } from "./StudentProfile";
@@ -26,6 +27,12 @@ function PageShell({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
+  const [identity, setIdentity] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+  return <><SchoolApp onIdentity={setIdentity} onReady={() => setReady(true)} />{ready && <Adjutant key={identity ?? "public"} signedIn={identity !== null} />}</>;
+}
+
+function SchoolApp({ onIdentity, onReady }: { onIdentity: (id: string | null) => void; onReady: () => void }) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +46,7 @@ export default function App() {
     const appUser = { uid: u.id, email: u.email ?? null };
     const r = await getRole(u.id);
     setUser(appUser);
+    onIdentity(u.id);
     setRole(r);
     if (r === "student") {
       const p = await loadProfileData(u.id);
@@ -117,13 +125,14 @@ export default function App() {
   async function handleLogout() {
     await supabase.auth.signOut();
     setUser(null);
+    onIdentity(null);
     setView("login");
     setMessage("");
     setMode("login");
   }
 
   if (booting) {
-    return <Splash onDone={() => setBooting(false)} />;
+    return <Splash onDone={() => { setBooting(false); onReady(); }} />;
   }
 
   if (user && view === "profile") {

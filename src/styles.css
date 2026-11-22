@@ -63,6 +63,7 @@
 
 :root {
   --school-black: oklch(0 0 0);
+  --adjutant-shadow: 0 12px 44px oklch(0.15 0.02 250 / 28%);
   --school-ink: oklch(0.28 0.07 250);
   --school-paper: oklch(0.98 0.003 250);
   --school-gold: oklch(0.83 0.16 88);
@@ -150,3 +151,30 @@
     color: var(--color-foreground);
   }
 }
+
+.adjutant-shell { color: var(--foreground); font-family: "Sora", sans-serif; }
+.adjutant-shell button { width: auto; margin: 0; letter-spacing: 0; }
+.adjutant-launch { position: fixed; bottom: 22px; right: 22px; z-index: 40; height: 58px; gap: 10px; padding: 6px 16px 6px 6px; background: var(--school-gold); color: var(--school-ink); box-shadow: var(--adjutant-shadow); border-radius: 8px; }
+.adjutant-launch:hover { background: var(--school-gold); }
+.adjutant-launch img { width: 46px; height: 46px; object-fit: contain; }
+.adjutant-window { position: fixed; right: 22px; bottom: 22px; z-index: 50; width: min(440px, calc(100vw - 32px)); height: min(640px, calc(100dvh - 44px)); display: flex; flex-direction: column; background: var(--background); color: var(--foreground); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--adjutant-shadow); overflow: hidden; }
+.adjutant-header { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 12px; background: var(--school-ink); color: var(--school-paper); border-bottom: 3px solid var(--school-gold); }
+.adjutant-header img { width: 46px; height: 46px; object-fit: contain; }
+.adjutant-header div { flex: 1; min-width: 0; }
+.adjutant-header h2 { color: inherit; font-size: 18px; margin: 0 0 2px; letter-spacing: 0; }
+.adjutant-header span { font-size: 11px; }
+.adjutant-header button { padding: 8px; width: 34px; height: 34px; background: transparent; color: inherit; }
+.adjutant-header button:hover { background: var(--school-overlay); }
+.adjutant-transcript { min-height: 0; }
+.adjutant-shell p { color: inherit; }
+.adjutant-shell .is-user > div:first-child { background: var(--primary); color: var(--primary-foreground); }
+.adjutant-shell .is-assistant > div:first-child { background: transparent; color: var(--foreground); }
+.adjutant-welcome { text-align: center; padding: 28px 12px; }
+.adjutant-welcome img { width: 130px; height: 130px; object-fit: contain; margin: 0 auto 16px; }
+.adjutant-welcome h3 { font-size: 18px; margin: 0 0 8px; }
+.adjutant-welcome p { color: var(--muted-foreground); font-size: 14px; }
+.adjutant-composer { flex-shrink: 0; padding: 12px; border-top: 1px solid var(--border); }
+.adjutant-composer textarea { min-height: 72px; max-height: 140px; font-size: 16px; color: var(--foreground); }
+.adjutant-composer button { width: 32px; height: 32px; padding: 6px; }
+.adjutant-shell .adjutant-error { color: var(--destructive); font-size: 13px; margin-bottom: 10px; }
+@media (max-width: 480px) { .adjutant-window { right: 12px; bottom: 12px; width: calc(100vw - 24px); height: min(640px, calc(100dvh - 24px)); } .adjutant-launch { right: 14px; bottom: 14px; } }
