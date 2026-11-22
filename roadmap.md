@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Finish Adjutant with the robot image, streamed answers and an unsaved single chat
+- [ ] Verify public and signed-in assistant use, reset and mobile layout
+
 - [x] Match the reference loading screen with the RMAC logo and animated bars
 - [x] Restyle the menu with a formal school header, full-page photo and working navigation
 
