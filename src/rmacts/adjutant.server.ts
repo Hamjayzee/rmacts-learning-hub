@@ -17,7 +17,6 @@ export const respond = createServerOnlyFn(async (data: ChatInput, materialContex
           model: "openai/gpt-6-astra",
           instructions: `${instructions}\nAvailable learning material metadata (not document contents):\n${materialContext}`,
           input: data.messages,
-          store: false,
         }, { signal: abort.signal });
         let completed = false;
         for await (const event of stream) {
