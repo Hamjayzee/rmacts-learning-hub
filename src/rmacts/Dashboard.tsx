@@ -158,7 +158,7 @@ export default function Dashboard({ user, role, onLogout }: { user: AppUser; rol
             <div className="section-head">
               <h3>My Profile</h3>
             </div>
-            <StudentProfile user={user} onSaveed={loadUserProfile} />
+            <StudentProfile user={user} embedded onSaveed={loadUserProfile} />
           </section>
         )}
 

@@ -50,9 +50,9 @@ function SchoolApp({ onIdentity, onReady }: { onIdentity: (id: string | null) =>
     setRole(r);
     if (r === "student") {
       const p = await loadProfileData(u.id);
-      if (!p || !p.surname) {
+      if (!p || !p.bioCompleted) {
         setView("profile");
-        setMessage("Please complete your profile to continue.");
+        setMessage("Please complete your student bio data to continue.");
         return;
       }
     }
@@ -137,13 +137,15 @@ function SchoolApp({ onIdentity, onReady }: { onIdentity: (id: string | null) =>
 
   if (user && view === "profile") {
     return (
-      <StudentProfile
-        user={user}
-        onSaveed={() => {
-          setView("dashboard");
-          setMessage("Welcome to RMACTS Learning Hub!");
-        }}
-      />
+      <PageShell>
+        <StudentProfile
+          user={user}
+          onSaveed={() => {
+            setView("dashboard");
+            setMessage("Welcome to RMACTS Learning Hub!");
+          }}
+        />
+      </PageShell>
     );
   }
 

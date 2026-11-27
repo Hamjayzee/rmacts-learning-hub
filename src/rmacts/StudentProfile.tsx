@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
 import { supabase, signedUrl, type AppUser } from "./cloud";
 import logoUrl from "./assets/rmacts-logo.png.asset.json";
 
@@ -7,7 +7,14 @@ type ProfileData = {
   otherNames: string;
   serviceNumber: string;
   rate: string;
+  dateOfBirth: string;
+  gender: string;
+  phone: string;
+  address: string;
+  about: string;
+  hobbies: string;
   photoUrl: string;
+  bioCompleted: boolean;
 };
 
 const EMPTY_PROFILE: ProfileData = {
@@ -15,10 +22,45 @@ const EMPTY_PROFILE: ProfileData = {
   otherNames: "",
   serviceNumber: "",
   rate: "",
+  dateOfBirth: "",
+  gender: "",
+  phone: "",
+  address: "",
+  about: "",
+  hobbies: "",
   photoUrl: "",
+  bioCompleted: false,
 };
 
 const MAX_PHOTO_BYTES = 1024 * 1024;
+
+export const BIO_STEPS = [
+  { id: "bio", label: "Bio Data" },
+  { id: "personal", label: "Personal Info" },
+  { id: "hobbies", label: "Hobbies" },
+  { id: "passport", label: "Passport" },
+] as const;
+
+export function validateBioStep(step: number, data: ProfileData, hasPhoto: boolean): string | null {
+  if (step === 0) {
+    if (!data.surname.trim() || !data.otherNames.trim() || !data.serviceNumber.trim() || !data.rate.trim()) {
+      return "Please complete all bio data fields before continuing.";
+    }
+  } else if (step === 1) {
+    if (!data.dateOfBirth.trim() || !data.gender.trim() || !data.phone.trim() || !data.about.trim()) {
+      return "Please complete your personal information before continuing.";
+    }
+  } else if (step === 2) {
+    if (!data.hobbies.trim()) {
+      return "Please enter your hobbies before continuing.";
+    }
+  } else if (step === 3) {
+    if (!hasPhoto) {
+      return "Please upload your passport photograph to finish.";
+    }
+  }
+  return null;
+}
 
 
 async function compressImage(file: File, maxBytes: number): Promise<Blob> {
@@ -66,11 +108,14 @@ async function compressImage(file: File, maxBytes: number): Promise<Blob> {
 export default function StudentProfile({
   user,
   onSaveed,
+  embedded = false,
 }: {
   user: AppUser;
   onSaveed: () => void;
+  embedded?: boolean;
 }) {
   const [data, setData] = useState<ProfileData>(EMPTY_PROFILE);
+  const [step, setStep] = useState(0);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
   const [loading, setLoading] = useState(true);
@@ -83,7 +128,7 @@ export default function StudentProfile({
       const d = await loadProfileData(user.uid);
       if (d) {
         setData(d);
-        setPhotoPreview(await signedUrl("profile-photos", d.photoUrl));
+        if (d.photoUrl) setPhotoPreview(await signedUrl("profile-photos", d.photoUrl));
       }
     } catch {
       setMessage("Could not load your profile. Please try again.");
@@ -91,6 +136,10 @@ export default function StudentProfile({
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    loadProfile();
+  }, [user.uid]);
 
   async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -110,8 +159,32 @@ export default function StudentProfile({
     reader.readAsDataURL(file);
   }
 
+  function handleNext() {
+    const err = validateBioStep(step, data, Boolean(photoFile || data.photoUrl));
+    if (err) {
+      setMessage(err);
+      return;
+    }
+    setMessage("");
+    setStep(s => Math.min(s + 1, BIO_STEPS.length - 1));
+  }
+
+  function handleBack() {
+    setMessage("");
+    setStep(s => Math.max(s - 1, 0));
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (step < BIO_STEPS.length - 1) {
+      handleNext();
+      return;
+    }
+    const err = validateBioStep(step, data, Boolean(photoFile || data.photoUrl));
+    if (err) {
+      setMessage(err);
+      return;
+    }
     if (saving) return;
     setSaving(true);
     setMessage("Saving your profile...");
@@ -134,7 +207,14 @@ export default function StudentProfile({
         otherNames: data.otherNames.trim(),
         serviceNumber: data.serviceNumber.trim(),
         rate: data.rate.trim(),
+        dateOfBirth: data.dateOfBirth.trim(),
+        gender: data.gender.trim(),
+        phone: data.phone.trim(),
+        address: data.address.trim(),
+        about: data.about.trim(),
+        hobbies: data.hobbies.trim(),
         photoUrl,
+        bioCompleted: true,
       };
 
       const { error } = await supabase.from("profiles").upsert({
@@ -144,7 +224,14 @@ export default function StudentProfile({
         other_names: profileData.otherNames,
         service_number: profileData.serviceNumber,
         rate: profileData.rate,
+        date_of_birth: profileData.dateOfBirth,
+        gender: profileData.gender,
+        phone: profileData.phone,
+        address: profileData.address,
+        about: profileData.about,
+        hobbies: profileData.hobbies,
         photo_url: profileData.photoUrl,
+        bio_completed: true,
         updated_at: new Date().toISOString(),
       });
       if (error) throw error;
@@ -160,6 +247,7 @@ export default function StudentProfile({
   }
 
   if (loading) {
+    if (embedded) return <p className="muted">Loading your profile...</p>;
     return (
       <main className="container">
         <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
@@ -169,76 +257,116 @@ export default function StudentProfile({
     );
   }
 
+  const form = (
+    <form className="panel profile-panel" onSubmit={handleSubmit} noValidate>
+      <ol className="bio-steps" aria-label="Bio data steps">
+        {BIO_STEPS.map((s, idx) => (
+          <li key={s.id} className={`bio-step${idx === step ? " active" : ""}${idx < step ? " done" : ""}`}>
+            <span className="bio-step-num">{idx + 1}</span>
+            <span className="bio-step-label">{s.label}</span>
+          </li>
+        ))}
+      </ol>
+
+      {step === 0 && (
+        <>
+          <h2>Student Bio Data</h2>
+          <label htmlFor="bio-surname">Surname</label>
+          <input id="bio-surname" type="text" value={data.surname} onChange={e => setData({ ...data, surname: e.target.value })} required placeholder="e.g. Mensah" />
+
+          <label htmlFor="bio-other-names">Other Names</label>
+          <input id="bio-other-names" type="text" value={data.otherNames} onChange={e => setData({ ...data, otherNames: e.target.value })} required placeholder="e.g. Kwame Boateng" />
+
+          <label htmlFor="bio-service-number">Service Number</label>
+          <input id="bio-service-number" type="text" value={data.serviceNumber} onChange={e => setData({ ...data, serviceNumber: e.target.value })} required placeholder="e.g. SN-2024-0123" />
+
+          <label htmlFor="bio-rate">Rate / Rank</label>
+          <input id="bio-rate" type="text" value={data.rate} onChange={e => setData({ ...data, rate: e.target.value })} required placeholder="e.g. Ordinary Seaman" />
+        </>
+      )}
+
+      {step === 1 && (
+        <>
+          <h2>Personal Information</h2>
+          <label htmlFor="bio-dob">Date of Birth</label>
+          <input id="bio-dob" type="date" value={data.dateOfBirth} onChange={e => setData({ ...data, dateOfBirth: e.target.value })} required />
+
+          <label htmlFor="bio-gender">Gender</label>
+          <select id="bio-gender" value={data.gender} onChange={e => setData({ ...data, gender: e.target.value })} required>
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+
+          <label htmlFor="bio-phone">Phone Number</label>
+          <input id="bio-phone" type="tel" value={data.phone} onChange={e => setData({ ...data, phone: e.target.value })} required placeholder="e.g. +233 24 000 0000" />
+
+          <label htmlFor="bio-address">Address / Unit (optional)</label>
+          <input id="bio-address" type="text" value={data.address} onChange={e => setData({ ...data, address: e.target.value })} placeholder="e.g. Takoradi Naval Base" />
+
+          <label htmlFor="bio-about">About Yourself</label>
+          <textarea id="bio-about" rows={3} value={data.about} onChange={e => setData({ ...data, about: e.target.value })} required placeholder="Tell us a little about yourself and your training goals" />
+        </>
+      )}
+
+      {step === 2 && (
+        <>
+          <h2>Hobbies &amp; Interests</h2>
+          <label htmlFor="bio-hobbies">Your Hobbies</label>
+          <textarea id="bio-hobbies" rows={4} value={data.hobbies} onChange={e => setData({ ...data, hobbies: e.target.value })} required placeholder="e.g. Swimming, reading maritime history, football, chess" />
+        </>
+      )}
+
+      {step === 3 && (
+        <>
+          <h2>Upload Passport Photograph</h2>
+          <div className="photo-section">
+            <div className="photo-preview">
+              {photoPreview ? (
+                <img src={photoPreview} alt="Passport preview" />
+              ) : (
+                <span className="photo-placeholder">No photo</span>
+              )}
+            </div>
+            <div className="photo-upload">
+              <label htmlFor="bio-passport">Passport Photograph</label>
+              <p className="muted">JPG or PNG, max 1MB. Large images are auto-compressed.</p>
+              <input id="bio-passport" type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} />
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="step-actions">
+        {step > 0 && (
+          <button type="button" className="secondary" onClick={handleBack} disabled={saving}>
+            Back
+          </button>
+        )}
+        {step < BIO_STEPS.length - 1 ? (
+          <button type="button" onClick={handleNext}>
+            Next
+          </button>
+        ) : (
+          <button type="submit" disabled={saving}>
+            {saving ? "Saving..." : embedded ? "Save Profile" : "Finish & Go to Overview"}
+          </button>
+        )}
+      </div>
+
+      {message && <p className={message.includes("success") ? "" : "error-msg"}>{message}</p>}
+    </form>
+  );
+
+  if (embedded) return form;
+
   return (
     <main className="container">
       <img src={logoUrl.url} alt="RMACTS logo" className="brand-logo" />
       <h1>RMACTS Learning Hub</h1>
-      <p>Complete your student profile to continue.</p>
-
-      <form className="panel profile-panel" onSubmit={handleSubmit}>
-        <h2>Student Profile</h2>
-
-        <div className="photo-section">
-          <div className="photo-preview">
-            {photoPreview ? (
-              <img src={photoPreview} alt="Profile" />
-            ) : (
-              <span className="photo-placeholder">No photo</span>
-            )}
-          </div>
-          <div className="photo-upload">
-            <label>Passport Photograph</label>
-            <p className="muted">JPG or PNG, max 1MB. Large images are auto-compressed.</p>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handlePhotoChange}
-            />
-          </div>
-        </div>
-
-        <label>Surname</label>
-        <input
-          type="text"
-          value={data.surname}
-          onChange={e => setData({ ...data, surname: e.target.value })}
-          required
-          placeholder="e.g. Mensah"
-        />
-
-        <label>Other Names</label>
-        <input
-          type="text"
-          value={data.otherNames}
-          onChange={e => setData({ ...data, otherNames: e.target.value })}
-          required
-          placeholder="e.g. Kwame Boateng"
-        />
-
-        <label>Service Number</label>
-        <input
-          type="text"
-          value={data.serviceNumber}
-          onChange={e => setData({ ...data, serviceNumber: e.target.value })}
-          required
-          placeholder="e.g. SN-2024-0123"
-        />
-
-        <label>Rate / Rank</label>
-        <input
-          type="text"
-          value={data.rate}
-          onChange={e => setData({ ...data, rate: e.target.value })}
-          required
-          placeholder="e.g. Ordinary Seaman"
-        />
-
-        <button type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save Profile"}
-        </button>
-
-        {message && <p className={message.includes("success") ? "" : "error-msg"}>{message}</p>}
-      </form>
+      <p>Complete your student bio data to continue to your overview.</p>
+      {form}
     </main>
   );
 }
@@ -253,6 +381,13 @@ async function loadProfileData(uid: string): Promise<ProfileData | null> {
     otherNames: data.other_names,
     serviceNumber: data.service_number,
     rate: data.rate,
+    dateOfBirth: data.date_of_birth,
+    gender: data.gender,
+    phone: data.phone,
+    address: data.address,
+    about: data.about,
+    hobbies: data.hobbies,
     photoUrl: data.photo_url,
+    bioCompleted: data.bio_completed,
   };
 }

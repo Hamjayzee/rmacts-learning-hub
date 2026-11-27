@@ -49,10 +49,17 @@ export type Database = {
       }
       profiles: {
         Row: {
+          about: string
+          address: string
+          bio_completed: boolean
           created_at: string
+          date_of_birth: string
           email: string | null
+          gender: string
+          hobbies: string
           id: string
           other_names: string
+          phone: string
           photo_url: string
           rate: string
           service_number: string
@@ -60,10 +67,17 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          about?: string
+          address?: string
+          bio_completed?: boolean
           created_at?: string
+          date_of_birth?: string
           email?: string | null
+          gender?: string
+          hobbies?: string
           id: string
           other_names?: string
+          phone?: string
           photo_url?: string
           rate?: string
           service_number?: string
@@ -71,10 +85,17 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          about?: string
+          address?: string
+          bio_completed?: boolean
           created_at?: string
+          date_of_birth?: string
           email?: string | null
+          gender?: string
+          hobbies?: string
           id?: string
           other_names?: string
+          phone?: string
           photo_url?: string
           rate?: string
           service_number?: string
