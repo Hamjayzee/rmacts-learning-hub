@@ -15,6 +15,13 @@
       "when": 1793609136986,
       "tag": "0001_rmacts_storage_tighten",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795777750477,
+      "tag": "0002_restrict_storage_objects_select_policy",
+      "breakpoints": true
     }
   ]
 }
