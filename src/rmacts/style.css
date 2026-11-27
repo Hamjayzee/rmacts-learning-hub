@@ -67,17 +67,23 @@ label {
   font-size: 14px;
 }
 
-input {
+input, select, textarea {
   display: block;
   width: 100%;
   padding: 13px;
   border: 1px solid #cbd5e1;
   border-radius: 9px;
   font-size: 16px;
+  font-family: inherit;
   background: #ffffff;
 }
 
-input:focus {
+textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+input:focus, select:focus, textarea:focus {
   outline: 2px solid #93c5fd;
   border-color: #2563eb;
 }
@@ -219,6 +225,48 @@ button.link-btn { width: auto; margin: 0; padding: 4px 8px; background: none; co
 
 /* ===== Profile ===== */
 .profile-panel { max-width: 560px; }
+.bio-steps {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid #e1e7ef;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.bio-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+.bio-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+.bio-step.active { color: #10243a; }
+.bio-step.active .bio-step-num { background: #10243a; color: #ffb703; }
+.bio-step.done { color: #15803d; }
+.bio-step.done .bio-step-num { background: #dcfce7; color: #15803d; }
+.step-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.step-actions button {
+  margin-top: 0;
+}
 .photo-section {
   display: flex; gap: 18px; align-items: flex-start;
   margin: 12px 0 20px; padding-bottom: 18px;
